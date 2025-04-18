@@ -21,9 +21,17 @@ nodes:
   - containerPort: 30007 # New Gateway 
     hostPort: 30007
   extraMounts:
-  - hostPath: /Users/zen/zen/istio_study/istio-in-action/book-source-code-master
+  - hostPath: /Users/zen/zen/istio_study/istio-in-action # 자신의 경로로.
     containerPath: /istiobook
 networking:
   podSubnet: 10.10.0.0/16
   serviceSubnet: 10.200.1.0/24
 EOF
+
+# 노드에 기본 툴 설치
+docker exec -it myk8s-control-plane sh -c 'apt update && apt install tree psmisc lsof wget bridge-utils net-tools dnsutils tcpdump ngrep iputils-ping git vim -y'
+
+# (옵션) metrics-server
+helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
+helm install metrics-server metrics-server/metrics-server --set 'args[0]=--kubelet-insecure-tls' -n kube-system
+kubectl get all -n kube-system -l app.kubernetes.io/instance=metrics-server
